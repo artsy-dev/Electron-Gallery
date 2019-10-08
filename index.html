@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>My app</title>
+    <meta name="generator" content="PWA Starter Kit">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="My App description">
+    <link rel="stylesheet" href="./fonts/roboto/roboto.css">
+    <link rel="stylesheet" href="./fonts/noto-sans/noto-sans.css">
+    <style>
+      html {
+        background: rgb(39,42,45);
+      }
+      body {
+        margin: 0;
+        background: rgb(39,42,45);       /* This is a font-stack that tries to use the system-default sans-serifs first */
+        font-family: Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+        line-height: 1.5;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <my-app appTitle="my app"></my-app>
+    <script>
+      window.process = {
+        env: {
+          NODE_ENV: 'development'
+        }
+      }
+      require('./src/views/my-app.js');
+    </script>
+  </body>
+</html>
