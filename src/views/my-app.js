@@ -5,7 +5,12 @@ import { updateMetadata } from 'pwa-helpers/metadata.js';
 import { SharedStyles } from '../components/shared-styles'
 
 // This element is connected to the Redux store.
-import { store } from '../store.js';
+import { store } from '../store';
+import { router } from '../routes';
+
+import {
+  navigate
+} from '../actions/app';
 
 // These are the elements needed by this element.
 import '@polymer/app-layout/app-header/app-header.js';
@@ -18,18 +23,12 @@ import '@polymer/iron-icon';
 import '@polymer/iron-icons';
 import '@polymer/paper-button';
 
-import '../components/snack-bar.js';
 import '../components/window-frame';
-import '../components/search-input';
 
 class MyApp extends connect(store)(LitElement) {
   static get properties() {
     return {
-      appTitle: { type: String },
-      _page: { type: String },
-      _drawerOpened: { type: Boolean },
-      _snackbarOpened: { type: Boolean },
-      _offline: { type: Boolean }
+      _title: { type: String }
     };
   }
 
@@ -77,23 +76,6 @@ class MyApp extends connect(store)(LitElement) {
           padding-right: 44px;
         }
 
-        .toolbar-list {
-          display: none;
-        }
-
-        .toolbar-list > a {
-          display: inline-block;
-          color: var(--app-header-text-color);
-          text-decoration: none;
-          line-height: 30px;
-          padding: 4px 24px;
-        }
-
-        .toolbar-list > a[selected] {
-          color: var(--app-header-selected-color);
-          border-bottom: 4px solid var(--app-header-selected-color);
-        }
-
         /* Workaround for IE11 displaying <main> as inline */
         main {
           display: block;
@@ -114,7 +96,7 @@ class MyApp extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <window-frame title="${this.appTitle + ' - ' + this._page}" iconSrc="./images/favicon.ico">
+      <window-frame title="Artsy Gallery - ${this._title}" iconSrc="./images/favicon.ico">
         <app-header condenses reveals effects="waterfall">
           <paper-tabs sticky>
             <paper-tab><span>View 1</span></paper-tab>
@@ -126,10 +108,6 @@ class MyApp extends connect(store)(LitElement) {
         </app-header>
 
         <main role="main" class="main-content">
-          <my-view1 class="page" ?active="${this._page === 'view1'}"></my-view1>
-          <my-view2 class="page" ?active="${this._page === 'view2'}"></my-view2>
-          <my-view3 class="page" ?active="${this._page === 'view3'}"></my-view3>
-          <my-view404 class="page" ?active="${this._page === 'view404'}"></my-view404>
         </main>
       </window-frame>
     `;
@@ -138,8 +116,8 @@ class MyApp extends connect(store)(LitElement) {
   update(changedProps) {
     if(changedProps.has('_page')) {
       updateMetadata({
-        title: this.appTitle + ' - ' + this._page,
-        description: this.appTitle + ' - ' + this._page
+        title: 'Artsy Gallery - ' + this._title,
+        description: 'Artsy Gallery - ' + this._title
       })
     }
     super.update(changedProps);
@@ -152,6 +130,10 @@ class MyApp extends connect(store)(LitElement) {
       const scrollTarget = windowFrame.renderRoot.querySelector('#body');
       header.scrollTarget = scrollTarget;
     })
+    router.on('page-change', (page) => {
+      store.dispatch(navigate(page));
+    });
+    router.navigate('dashboard');
   }
 
   constructor() {
@@ -160,7 +142,7 @@ class MyApp extends connect(store)(LitElement) {
   }
 
   stateChanged(state) {
-    this._page = state.app.page;
+    this._title = state.app.page._title;
   }
 }
 
