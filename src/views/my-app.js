@@ -9,7 +9,8 @@ import { store } from '../store';
 import { router } from '../routes';
 
 import {
-  navigate
+  navigate,
+  setPages
 } from '../actions/app';
 
 // These are the elements needed by this element.
@@ -43,6 +44,7 @@ class MyApp extends connect(store)(LitElement) {
 
         window-frame {
           background: rgb(39,42,45);
+          --frame-header-background: #1d1f22;
         }
 
         paper-tabs {
@@ -64,6 +66,7 @@ class MyApp extends connect(store)(LitElement) {
         app-header {
           position: sticky;
           top: 0;
+          background: #1d1f22;
         }
 
         [main-title] {
@@ -96,7 +99,7 @@ class MyApp extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <window-frame title="Artsy Gallery - ${this._title}" iconSrc="./images/favicon.ico">
+      <window-frame title="Artsy Gallery - ${this._title}" icon-src="./images/manifest/icon-72x72.png">
         <app-header condenses reveals effects="waterfall">
           <paper-tabs sticky>
             <paper-tab><span>View 1</span></paper-tab>
@@ -127,11 +130,13 @@ class MyApp extends connect(store)(LitElement) {
     const header = this.renderRoot.querySelector('app-header');
     const windowFrame = this.renderRoot.querySelector('window-frame');
     windowFrame.addEventListener('firstUpdated', () => {
-      const scrollTarget = windowFrame.renderRoot.querySelector('#body');
+      const scrollTarget = windowFrame.renderRoot.querySelector('#scroll-container');
       header.scrollTarget = scrollTarget;
     })
+    store.dispatch(setPages(router.resolveAll()));
     router.on('page-change', (page) => {
       store.dispatch(navigate(page));
+      windowFrame.scrollUp();
     });
     router.navigate('dashboard');
   }
@@ -141,8 +146,8 @@ class MyApp extends connect(store)(LitElement) {
     setPassiveTouchGestures(true);
   }
 
-  stateChanged(state) {
-    this._title = state.app.page._title;
+  stateChanged({app: {page = {}}}) {
+    this._title = page.title;
   }
 }
 

@@ -21,7 +21,8 @@ function createWindow () {
     minHeight: 500,
     minWidth: 760,
     experimentalFeatures: true,
-    backgroundColor: '#212121'
+    backgroundColor: '#212121',
+    icon: path.join(__dirname, './images/manifest/icon-144x144.png')
   })
 
   // mainWindow.setMenuBarVisibility(false);

@@ -12,6 +12,8 @@ export class Router extends EventEmitter{
     this._activeRoute = { id: 'NO_PAGE_SELECTED' }
     this._parseSchema(schema);
     initiated = true;
+    this._history = [];
+    this._historyIndex = 0;
   }
 
   get activeRoute () {
@@ -92,20 +94,52 @@ export class Router extends EventEmitter{
   navigate(id, params) {
     if(!(id in this._routes)) throw new Error(`There is no page with the id ${id}`);
     const resolvedRoute = this._resolveRouteObject(this._routes[id], {params});
+
+    const deepEqual = (obj, obj2) => {
+      let objKeys = Object.keys(obj)
+      if(objKeys.length !== Object.keys(obj2).length) return false;
+      for(const key of objKeys) {
+        if(typeof obj[key] === 'object') {
+          if(typeof obj2 !== 'object') return false;
+          if(obj[key] === null) {
+            if(!obj2[key] === null) return;
+          } else if(!deepEqual(obj[key], obj2[key])) return false;
+        } else if(obj[key] !== obj2[key]) {
+          return false;
+        }
+      }
+      return true;
+    }
     
     if(this._activeRoute.id === resolvedRoute.id) {
-      let changes = false
-      for(const [key, value] of resolvedRoute) {
-        if(value !== this._activeRoute[key]) {
-          changes = true;
-          break
-        };
-      }
-      if(!changes) return;
+      if(deepEqual(this._activeRoute, resolvedRoute)) return;
     }
 
+    if(this._history.length > 19) this._history.shift();
+    this._history.splice(this._historyIndex + 1);
+    this._history.push(resolvedRoute);
+    this._historyIndex = this._history.length - 1;
+    
     this._activeRoute = resolvedRoute;
     this.emit('page-change', resolvedRoute);
+  }
+
+  back() {
+    if(this._historyIndex > 0) {
+      const {params, id} = this._history[--this._historyIndex]
+      const resolvedRoute = this.resolvePage(id, params);
+      this._activeRoute = resolvedRoute;
+      this.emit('page-change', resolvedRoute);
+    }
+  }
+
+  forward() {
+    if(this._historyIndex < this._history.length - 1) {
+      const {params, id} = this._history[++this._historyIndex]
+      const resolvedRoute = this.resolvePage(id, params);
+      this._activeRoute = resolvedRoute;
+      this.emit('page-change', resolvedRoute);
+    }
   }
 
   resolvePage(id, params) {
@@ -119,6 +153,22 @@ export class Router extends EventEmitter{
       resolvedRoutes.push(this._resolveRouteObject(route, { validateParams: false }));
     }
     return resolvedRoutes;
+  }
+  
+  get history () {
+    return this._history.slice(0, this._historyIndex);
+  }
+
+  get forwardsHistory () {
+    return this._history.slice(this._historyIndex + 1);
+  }
+
+  get canGoForward () {
+    return this._historyIndex < this._history.length - 1;
+  }
+
+  get canGoBack () {
+    return this._historyIndex > 0;
   }
 }
 
