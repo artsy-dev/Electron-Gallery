@@ -13,23 +13,17 @@ import {
   setPages
 } from '../actions/app';
 
-// These are the elements needed by this element.
-import '@polymer/app-layout/app-header/app-header.js';
-import '@polymer/app-layout/app-scroll-effects/effects/waterfall.js';
-import '@polymer/app-layout/app-toolbar/app-toolbar.js';
-import '@polymer/paper-tabs/paper-tab';
-import '@polymer/paper-tabs/paper-tabs';
-import '@polymer/paper-input/paper-input';
-import '@polymer/iron-icon';
-import '@polymer/iron-icons';
-import '@polymer/paper-button';
+console.log(router);
 
+// These are the elements needed by this element.
 import '../components/window-frame';
+import '../components/view-container';
 
 class MyApp extends connect(store)(LitElement) {
   static get properties() {
     return {
-      _title: { type: String }
+      _title: { type: String },
+      _page: { type: Object }
     };
   }
 
@@ -40,6 +34,15 @@ class MyApp extends connect(store)(LitElement) {
         :host {
           display: block;
           --body-height: calc(100vh - 35px);
+          
+          --app-primary-color: #172c50;
+
+          --app-header-background-color: rgba(255,255,255,0.9);
+          --app-header-text-color: black;
+          
+          --app-drawer-width: 256px;
+
+          --paper-badge-background: rgb(23, 44, 80);
         }
 
         window-frame {
@@ -47,51 +50,16 @@ class MyApp extends connect(store)(LitElement) {
           --frame-header-background: #1d1f22;
         }
 
-        paper-tabs {
-          --paper-tabs-selection-bar-color: var(--app-primary-color);
-          max-width: 1100px;
-          margin: auto;
-        }
-
-        paper-tab {
-          color: var(--app-text-color);
-          --paper-tab-ink: var(--app-primary-color);
-        }
-
-        paper-tab > span {
-          font-weight: normal!important;
-          text-transform: uppercase;
-        }
-
-        app-header {
-          position: sticky;
-          top: 0;
-          background: #1d1f22;
-        }
-
-        [main-title] {
-          font-family: 'Pacifico';
-          text-transform: lowercase;
-          font-size: 30px;
-          /* In the narrow layout, the toolbar is offset by the width of the
-          drawer button, and the text looks not centered. Add a padding to
-          match that button */
-          padding-right: 44px;
-        }
-
-        /* Workaround for IE11 displaying <main> as inline */
-        main {
-          display: block;
-          min-height: calc(var(--body-height) - 48px);
-          height: 300vh;
-        }
-
-        .page {
+        [hidden] {
           display: none;
         }
 
-        .page[active] {
-          display: block;
+        .underline {
+          transition: color 0.2s ease-in-out;
+        }
+
+        .underline:hover {
+          color: black;
         }
       `
     ];
@@ -99,20 +67,11 @@ class MyApp extends connect(store)(LitElement) {
 
   render() {
     return html`
-      <window-frame title="Artsy Gallery - ${this._title}" icon-src="./images/manifest/icon-72x72.png">
-        <app-header condenses reveals effects="waterfall">
-          <paper-tabs sticky>
-            <paper-tab><span>View 1</span></paper-tab>
-            <paper-tab><span>View 2</span></paper-tab>
-            <paper-tab><span>View 3</span></paper-tab>
-            <paper-tab><span>View 4</span></paper-tab>
-            <paper-tab><span>View 5</span></paper-tab>
-          </paper-tabs>
-        </app-header>
-
-        <main role="main" class="main-content">
-        </main>
-      </window-frame>
+      <window-frame 
+        title="Artsy Gallery - ${this._title}"
+        icon-src="./images/manifest/icon-72x72.png">
+        <view-container page="${this._page.tagName}"></view-container>
+     </window-frame>
     `;
   }
 
@@ -127,18 +86,12 @@ class MyApp extends connect(store)(LitElement) {
   }
 
   firstUpdated() {
-    const header = this.renderRoot.querySelector('app-header');
-    const windowFrame = this.renderRoot.querySelector('window-frame');
-    windowFrame.addEventListener('firstUpdated', () => {
-      const scrollTarget = windowFrame.renderRoot.querySelector('#scroll-container');
-      header.scrollTarget = scrollTarget;
-    })
     store.dispatch(setPages(router.resolveAll()));
     router.on('page-change', (page) => {
       store.dispatch(navigate(page));
       windowFrame.scrollUp();
     });
-    router.navigate('dashboard');
+    router.navigate('gallery');
   }
 
   constructor() {
@@ -148,6 +101,7 @@ class MyApp extends connect(store)(LitElement) {
 
   stateChanged({app: {page = {}}}) {
     this._title = page.title;
+    this._page = page;
   }
 }
 

@@ -6,6 +6,7 @@ export const router = new Router({
     script: ({id}) => `../views/${id}.js`,
     title: ({id}) => id[0].toUpperCase() + id.substr(1).toLowerCase(),
     visible: ({depth}) => depth < 1,
+    tagName: ({id}) => `${id}-page`,
     autoTitle: false
   },
   routes: {
