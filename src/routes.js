@@ -10,7 +10,6 @@ export const router = new Router({
     autoTitle: false
   },
   routes: {
-    dashboard: {},
     gallery: {}
   }
 })

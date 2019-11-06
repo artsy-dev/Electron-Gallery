@@ -5,6 +5,7 @@ import { SharedStyles } from '../components/shared-styles';
 
 import { store } from '../store';
 import '@polymer/paper-icon-button';
+import '@polymer/iron-icons';
 import '../components/setting-prompt';
 import '../components/grid-container';
 
@@ -22,6 +23,9 @@ class GalleryPage extends connect(store)(PageViewElement) {
           max-width: 90vw;
         }
 
+        .grid-container {
+          height: calc(100vh - 35px);
+        }
       
         .grid-item img {
           width: 100%;
@@ -68,18 +72,6 @@ class GalleryPage extends connect(store)(PageViewElement) {
 
   render() {
     return html`
-      <settings-prompt 
-        .animations='${this._animations}'
-        @changed-config='${({detail: {width, height, animation}}) => this.startPresentation(width, height, animation)}'>
-      </settings-prompt>
-
-      <paper-icon-button 
-        class='settings-prompt-button' 
-        icon='settings' 
-        ?hidden='${!this._overview}'
-        @click='${() => this._toggleSettingsPrompt()}'>
-      </paper-icon-button>
-
       <grid-container class="grid-container" width="${this._width}" height="${this._height}">
         ${this.photos.slice(0, this._width * this._height).map(
           url => html`
@@ -92,7 +84,21 @@ class GalleryPage extends connect(store)(PageViewElement) {
             </div>
           `
         )}
-      </grid-container>
+      </grid-container> 
+      
+      <settings-prompt 
+        .animations='${this._animations}'
+        @changed-config='${({detail: {width, height, animation}}) => this.startPresentation(width, height, animation)}'>
+      </settings-prompt>
+
+      <paper-icon-button 
+        class='settings-prompt-button' 
+        icon='settings' 
+        ?hidden='${!this._overview}'
+        @click='${() => this._toggleSettingsPrompt()}'>
+      </paper-icon-button>
+
+      
     `;
   }
 
