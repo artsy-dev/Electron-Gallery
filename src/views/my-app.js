@@ -44,7 +44,7 @@ class MyApp extends connect(store)(LitElement) {
         }
 
         window-frame {
-          background: rgb(39,42,45);
+          background: white;
           --frame-header-background: #1d1f22;
         }
 
@@ -66,6 +66,7 @@ class MyApp extends connect(store)(LitElement) {
   render() {
     return html`
       <window-frame 
+        hide-scrollbar
         title="Artsy Gallery - ${this._title}"
         icon-src="./images/manifest/icon-72x72.png">
         <view-container page="${this._page.tagName}"></view-container>

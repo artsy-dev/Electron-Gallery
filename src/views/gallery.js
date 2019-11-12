@@ -127,6 +127,10 @@ class GalleryPage extends connect(store)(PageViewElement) {
 
     this._animations = [
       {
+        name: 'grass',
+        description: 'Potat'
+      },
+      {
         name: 'all',
         description: 'Beweegt alle foto\'s tegelijk naar boven of beneden.'
       },
@@ -257,112 +261,103 @@ class GalleryPage extends connect(store)(PageViewElement) {
           }
         }, 1000);
         break;
-      case 'grasss':
-        // make everything invisible
-        for (let invisibleItems = 0; invisibleItems < t; invisibleItems++) {
-          selectedElement[invisibleItems].style.opacity = 0;
-        }
-         /*
-          keep track if which item are visible by making a grid map
-          example :
-          1 0 0 0 0
-          1 0 0 0 0
-          1 0 0 0 0
-          1 0 0 0 0
-         */
-        for (let items = 0; items < t; items++) {
-          layer.push(0);
-        }
-          
-        // make a starting seed from which to begin of
-        let seed = Math.floor(Math.random() * t);
-        selectedElement[seed].style.opacity = 1;
-        layer[seed] = 1;
-        index++;
+        case "grass":
+          /*
+            keep track if which item are visible by making a grid map
+            0 is invisible
+            1 is invisible but a contender for making visible
+            2 is visible
+            example :
+            1 0 0 0 0
+            1 0 0 0 0
+            1 0 0 0 0
+            1 0 0 0 0
+           */
+          for (let items = 0; items < t; items++) {
+            selectedElement[items].style.opacity = 0;
+            layer.push(0);
+          }
 
-        var grassAnimate = setInterval(function() {
-          if (index < t) {
-            let number = Math.floor(Math.random() * t);
+          // make a starting seed from which to begin of
+          const intialSeed = Math.floor(Math.random() * t);
+          let availableItems = [];
+          selectedElement[intialSeed].classList.add("fade-in");
 
-            // de mogelijke acties die uit gevoerd kunnen worden
-            let available = 0;
-            let availableActions = [-width,-1,1,width];
-            
-            // repeat totdat dat je een element hebt die al zichtbaar is EN er een beschikbare plek hebt
-            while (available != 1) {
-              number = Math.floor(Math.random() * t);
-              if(layer[number] != 1){
-                
+          layer[intialSeed] = 2;
+          index++;
+
+          if ((intialSeed + 1) % width !== 0 && layer[+intialSeed + 1] === 0) {
+            layer[+intialSeed + 1] = 1;
+            availableItems.push(+intialSeed + 1);
+            //console.log("right", +intialSeed+1);
+          }
+
+          if (intialSeed - width >= 0 && layer[+intialSeed - width] === 0) {
+            layer[+intialSeed - width] = 1;
+            availableItems.push(+intialSeed - width);
+            //console.log("up", +intialSeed-width);
+          }
+
+          if (intialSeed % width !== 0 && layer[+intialSeed - 1] === 0) {
+            layer[+intialSeed - 1] = 1;
+            availableItems.push(+intialSeed - 1);
+            //console.log("left", +intialSeed-1);
+          }
+
+          if (+intialSeed + +width < t && layer[+intialSeed + +width] === 0) {
+            layer[+intialSeed + +width] = 1;
+            availableItems.push(+intialSeed + +width);
+            // console.log("down", +intialSeed + +width);
+          }
+
+          let rItem = availableItems.splice(
+            Math.floor(Math.random() * availableItems.length),
+            1
+          );
+
+          selectedElement[rItem[0]].classList.add("fade-in");
+
+          index++;
+
+          var grassAnimate = setInterval(function() {
+            if (index < t) {
+              if ((rItem + 1) % width !== 0 && layer[+rItem + 1] === 0) {
+                layer[+rItem + 1] = 1;
+                availableItems.push(+rItem + 1);
+                // console.log("right", +rItem + 1);
               }
-              else{
 
-              available = 0;
-              availableActions = [-width,-1,1,width];
-
-              // item staat helemaal rechts
-
-              let newitem = number;
-              if((newitem+1) % width == 0){
-                availableActions.splice(2,1);
-                console.log('right',newitem,number);
-               }
-
-               // item staat helemaal boven
-               newitem = number;
-               if(newitem-width <= 0 ){
-                console.log('top',newitem, number);
-                 availableActions.splice(0,1);
-               }
- 
-               // item staat helemaal links
-
-               if(number % width == 0){
-                console.log('left', number,width);
-                 availableActions.splice(1,1);
-               }
-
-               newitem = number;
-               if((newitem+width) >= t){
-                console.log('bottom', newitem , number);
-                 availableActions.splice(3,1);
-               }
-
-               for(let r = 0 ; r < availableActions.length ; r++ ){
-
-                 if(layer[number+availableActions[r]] === 0){
-                  available = 1;
-                 }
-               }
-               console.log('is a' , available);
+              if (rItem - width >= 0 && layer[+rItem - width] === 0) {
+                layer[+rItem - width] = 1;
+                availableItems.push(+rItem - width);
+                // console.log("up", +rItem - width);
               }
+
+              if (rItem % width !== 0 && layer[+rItem - 1] === 0) {
+                layer[+rItem - 1] = 1;
+                availableItems.push(+rItem - 1);
+                // console.log("left", +rItem - 1);
+              }
+
+              if (+rItem + +width < t && layer[+rItem + +width] === 0) {
+                layer[+rItem + +width] = 1;
+                availableItems.push(+rItem + +width);
+                // console.log("down", +rItem + +width);
+              }
+
+              rItem = availableItems.splice(
+                Math.floor(Math.random() * availableItems.length),
+                1
+              );
+
+              selectedElement[rItem[0]].classList.add("fade-in");
+            }
+            if (index === t) {
+              clearInterval(grassAnimate);
             }
 
-
-            var growDirection = Math.floor(Math.random() * availableActions.length);
-
-            //console.log(availableActions[growdirection], number , number+availableActions[growdirection] );
-           // console.log(availableActions);
-
-            while(layer[number+availableActions[growDirection]] == 1){
-              growDirection = Math.floor(Math.random() * availableActions.length)
-
-            }
-
-            console.log('toegestane acties  ' , availableActions); 
-            console.log('huidige index ' , number);
-
-            console.log('nieuwe index ' , number+availableActions[growDirection]);
-            selectedElement[number+availableActions[growDirection]].style.opacity = 1;
-
-            layer[number+availableActions[growDirection]] = 1;
-          
             index++;
-          }
-          if(index === t){
-            console.log('ended');
-            clearInterval(grassAnimate);
-          }
-        }, 500);
+          }, 500);
         break;
       case 'chronological-horizontal':
         for (let i = 0; i < t; i++) {
