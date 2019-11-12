@@ -1,21 +1,12 @@
 {
-  "name": "electron-quick-start",
+  "name": "electron-gallery",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "An Electron app for viewing pictures",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "license": "MIT",
   "dependencies": {
     "@polymer/app-layout": "^3.0.0",
     "@polymer/iron-icon": "^3.0.1",

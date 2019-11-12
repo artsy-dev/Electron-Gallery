@@ -80,8 +80,8 @@ class SettingsPrompt extends LitElement {
     return html`
       <paper-dialog class="dialog" no-cancel-on-outside-click>
         <h2 class="dialog-title">Animatie opties</h2>
-        <paper-input class="size-input" min="0" type="number" label="Breedte" @change="${e => this.setWidth(e)}" required></paper-input>
-        <paper-input class="size-input" min="0" type="number" label="Hoogte" @change="${e => this.setHeight(e)}" required></paper-input>
+        <paper-input class="size-input" min="0" type="number" label="Breedte" @change="${e => this.setWidth(e)}" auto-validate required></paper-input>
+        <paper-input class="size-input" min="0" type="number" label="Hoogte" @change="${e => this.setHeight(e)}" auto-validate required></paper-input>
         <div>
           <paper-dropdown-menu label="Animaties" vertical-offset="55" @selected-item-changed="${e => this.setAnimation(e)}">
             <paper-listbox slot="dropdown-content">
@@ -97,7 +97,8 @@ class SettingsPrompt extends LitElement {
           </paper-tooltip>
           <iron-icon icon="help-outline" id="help-icon" tab-index="0"></iron-icon>
         </div>
-        <paper-button @click="${this._pickDirectory}">Kies folder(s)</paper-button> <span>${this._directory || ""}</span>
+        <paper-button @click="${this._pickDirectory}">Kies folder(s)</paper-button> 
+        <span>${this._directory || ""}</span>
         
 
         <div class="wireframe grid-container">
@@ -172,7 +173,8 @@ class SettingsPrompt extends LitElement {
         detail: {
           height: this._height, 
           width: this._width, 
-          animation: this._animation
+          animation: this._animation,
+          directories: this._directory
         }
       })
     )

@@ -2,6 +2,7 @@ import { html, css } from 'lit-element';
 import { PageViewElement } from '../components/page-view-element';
 import { connect } from 'pwa-helpers/connect-mixin';
 import { SharedStyles } from '../components/shared-styles';
+import fs from "fs";
 
 import { store } from '../store';
 import '@polymer/paper-icon-button';
@@ -88,7 +89,7 @@ class GalleryPage extends connect(store)(PageViewElement) {
       
       <settings-prompt 
         .animations='${this._animations}'
-        @changed-config='${({detail: {width, height, animation}}) => this.startPresentation(width, height, animation)}'>
+        @changed-config='${({detail: {width, height, animation, directories}}) => this.startPresentation(width, height, animation, directories)}'>
       </settings-prompt>
 
       <paper-icon-button 
@@ -107,6 +108,7 @@ class GalleryPage extends connect(store)(PageViewElement) {
       _height: Number,
       _width: Number,
       photos: Array,
+      _directory: Array,
       _overview: Boolean,
       _animations: Array
     };
@@ -117,6 +119,7 @@ class GalleryPage extends connect(store)(PageViewElement) {
     this._width = 0;
     this._height = 0;
     this._overview = true;
+    this._directory = [];
 
     super.style.setProperty('--grid-width', this._width);
     super.style.setProperty('--grid-height', this._height);
@@ -156,6 +159,7 @@ class GalleryPage extends connect(store)(PageViewElement) {
         description: 'Laad de foto\'s per kolom van boven naar beneden in.'
       }
     ]
+    
   }
 
   updateGrid(width, height, animation) {
@@ -173,9 +177,23 @@ class GalleryPage extends connect(store)(PageViewElement) {
     }, 100);
   }
 
-  startPresentation(width, height, animation) {
+  startPresentation(width, height, animation, directories) {
     this._overview = false;
+    this._directory = directories;
+    console.log(directories)
     this.updateGrid(width, height, animation);
+
+    for (let directory of this._directory) {
+      fs.readdir(directory, (err, files) => {
+        if (err) {
+          console.error(err)
+          return console.log("Can't get images");
+        } else {
+          console.log(files.map(name => directory + name))
+          return files.map(name => directory + name);
+        }
+      });
+    }
 
     setTimeout(() => {
       this.animateElements(this._height, this._width, this._animation);
