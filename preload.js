@@ -3,8 +3,6 @@
 const _require = require("esm")(module)
 const url = require('url')
 
-console.log(process.versions);
-
 process.once('loaded', () => {
   global.require = _require
   global.resolveLocalURL = (filePath) => {

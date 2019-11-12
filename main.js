@@ -72,7 +72,6 @@ app.on('ready', () => {
     } else {
       filePath = path.join(__dirname, pathname);
     }
-    console.log(filePath, request.url);
     callback(filePath);
   }, function (error) {
     if (error)

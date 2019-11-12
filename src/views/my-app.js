@@ -13,8 +13,6 @@ import {
   setPages
 } from '../actions/app';
 
-console.log(router);
-
 // These are the elements needed by this element.
 import '../components/window-frame';
 import '../components/view-container';
@@ -71,7 +69,7 @@ class MyApp extends connect(store)(LitElement) {
         title="Artsy Gallery - ${this._title}"
         icon-src="./images/manifest/icon-72x72.png">
         <view-container page="${this._page.tagName}"></view-container>
-     </window-frame>
+      </window-frame>
     `;
   }
 

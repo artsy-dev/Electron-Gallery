@@ -80,7 +80,7 @@ class GalleryPage extends connect(store)(PageViewElement) {
               class="grid-item gallery-image invisible"
               ?hidden=${this._overview}>
               <img
-                src="${url}"
+                src="${resolveLocalURL(url)}"
                 alt="placeholder image"/>
             </div>
           `
@@ -126,10 +126,6 @@ class GalleryPage extends connect(store)(PageViewElement) {
     this.photos = [];
 
     this._animations = [
-      {
-        name: 'grasss',
-        description: 'Foto\'s laden naast elkaar in een willekeurige richting 1 voor 1 in.'
-      },
       {
         name: 'all',
         description: 'Beweegt alle foto\'s tegelijk naar boven of beneden.'
@@ -180,17 +176,15 @@ class GalleryPage extends connect(store)(PageViewElement) {
   startPresentation(width, height, animation, directories) {
     this._overview = false;
     this._directory = directories;
-    console.log(directories)
     this.updateGrid(width, height, animation);
 
-    for (let directory of this._directory) {
+    for (const directory of this._directory) {
       fs.readdir(directory, (err, files) => {
         if (err) {
-          console.error(err)
-          return console.log("Can't get images");
+          console.log("Can't get images");
+          throw err;
         } else {
-          console.log(files.map(name => directory + name))
-          return files.map(name => directory + name);
+          this.photos = files.map(name => `${directory}/${name}`);
         }
       });
     }
