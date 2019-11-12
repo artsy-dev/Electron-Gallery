@@ -28,7 +28,7 @@ function createWindow () {
   // mainWindow.setMenuBarVisibility(false);
   
   // and load the index.html of the app.
-  mainWindow.loadFile('index.html')
+  mainWindow.loadURL('app://localhost/index.html')
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
@@ -62,7 +62,16 @@ app.on('ready', () => {
 
   protocol.registerFileProtocol('app', function(request, callback) {
     const { pathname } = url.parse(request.url);
-    callback(path.join(__dirname, pathname));
+
+    const match = /^\/__local_file__\/([a-zA-Z]:.*)/.exec(pathname);
+    let filePath;
+    if(match) {
+      filePath = path.normalize(decodeURI(match[1]));
+    } else {
+      filePath = path.join(__dirname, pathname);
+    }
+    console.log(filePath, request.url);
+    callback(filePath);
   }, function (error) {
     if (error)
       console.error('Failed to register protocol')
